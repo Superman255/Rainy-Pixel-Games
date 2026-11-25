@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>After Effects – Windows Mockup</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    font-family:"Segoe UI", Arial, sans-serif;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden; /* no page scrolling */
+}
+
+body{
+    background: transparent;
+}
+
+/* ===== APP ===== */
+.app{
+    width:100vw;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    background: rgba(30,30,30,0.75);
+    backdrop-filter: blur(0px); /* ignored, OS handles blur */
+}
+
+/* ===== TITLE BAR ===== */
+.titlebar {
+    height: 32px;
+    background: #1f1f1f;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    -webkit-app-region: drag;
+    padding: 0; /* remove extra padding */
+    color: #ccc;
+    font-size: 13px;
+}
+
+.titlebar .title-text {
+    margin-left: 10px; /* small spacing from left edge */
+    line-height: 32px; /* vertically center text perfectly */
+}
+
+.window-buttons {
+    display: flex;
+    -webkit-app-region: no-drag;
+}
+
+.window-buttons div {
+    width: 46px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+}
+
+/* Windows-style hover colors */
+.window-buttons .close:hover {
+    background: #e81123;
+    color: white;
+}
+
+.window-buttons .minimize:hover {
+    background: #3c3c3c;
+}
+
+.window-buttons .close,
+.window-buttons .minimize {
+    background: transparent;
+    color: #ccc;
+}
+
+
+/* ===== MENU BAR ===== */
+.menubar{
+    height:28px;
+    background:#252525;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:0 8px;
+    color:#ddd;
+    font-size:13px;
+}
+.menu{
+    position:relative;
+    cursor:default;
+    user-select:none;
+}
+
+.menu:hover{
+    color:#fff;
+}
+
+.dropdown{
+    position:absolute;
+    top:28px;
+    left:0;
+    background:#2d2d2d;
+    min-width:140px;
+    display:none;
+    flex-direction:column;
+    z-index:10;
+}
+
+.menu.open .dropdown{
+    display:flex;
+}
+
+.dropdown div{
+    padding:6px 10px;
+    font-size:12px;
+    color:#ccc;
+}
+.dropdown div:hover{
+    background:#3a3a3a;
+    color:#fff;
+}
+
+
+/* ===== MAIN GRID ===== */
+.main{
+    flex:1;
+    display:grid;
+    grid-template-columns:240px 1fr 300px;
+    grid-template-rows:1fr 220px;
+    min-height:0; /* critical */
+}
+
+/* ===== PANELS ===== */
+.panel{
+    background:#2d2d2d;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+}
+
+.panel-header{
+    background:#3a3a3a;
+    padding:6px 8px;
+    font-size:11px;
+    text-transform:uppercase;
+    color:#bbb;
+}
+
+/* ===== PROJECT ===== */
+.project{
+    grid-column:1;
+    grid-row:1;
+}
+
+/* ===== VIEWER ===== */
+.viewer{
+    grid-column:2;
+    grid-row:1;
+    position:relative;
+    overflow:hidden;
+    background:#000;
+}
+
+.viewer-bg{
+    position:absolute;
+    inset:0;
+    background-size:cover;
+    background-position:center;
+    filter: blur(20px) brightness(0.8);
+    transform: scale(1.1); /* hide blur edges */
+}
+
+.viewer-overlay{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#aaa;
+    font-size:22px;
+    pointer-events:none;
+}
+
+.viewer::after{
+    content:"Composition";
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#555;
+    font-size:22px;
+}
+
+/* ===== EFFECTS ===== */
+.effects{
+    grid-column:3;
+    grid-row:1 / span 2;
+}
+
+/* ===== TIMELINE ===== */
+.timeline{
+    grid-column:1 / span 2;
+    grid-row:2;
+    background:#262626;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+}
+
+/* SCROLL CONTAINER (ONE SCROLLBAR) */
+.timeline-scroll{
+    flex:1;
+    display:grid;
+    grid-template-columns:240px 1fr;
+    overflow:auto; /* single scrollbar */
+}
+
+/* ===== LAYERS ===== */
+.layers{
+    background:#2a2a2a;
+}
+.layer{
+    height:28px;
+    display:flex;
+    align-items:center;
+    padding-left:8px;
+    color:#bbb;
+}
+
+/* ===== KEYFRAME BOARD ===== */
+.play-board{
+    display:grid;
+    grid-template-columns:repeat(120, 24px);
+    grid-template-rows:repeat(10, 28px);
+    min-width:2880px;
+    background:
+        linear-gradient(#0000 27px, #1b1b1b 28px),
+        linear-gradient(90deg, #0000 23px, #1b1b1b 24px);
+    background-size:24px 28px;
+}
+
+.pixel{
+    width:10px;
+    height:10px;
+    background:#f5c400;
+    transform:rotate(45deg);
+    place-self:center;
+}
+
+/* ===== STATUS BAR ===== */
+.statusbar{
+    height:22px;
+    background:#1f1f1f;
+    color:#888;
+    font-size:11px;
+    display:flex;
+    align-items:center;
+    padding:0 10px;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+    <div class="titlebar">
+    <div class="title-text">AniComp - (Anime.json)</div>
+    <div class="window-buttons">
+        <div class="minimize">−</div>
+        <div class="close">×</div>
+    </div>
+</div>
+
+    <div class="menubar">
+        <div class="menu">File
+            <div class="dropdown">
+                <div>New</div>
+                <div>Open</div>
+                <div>Save</div>
+                <div>Exit</div>
+            </div>
+        </div>
+        <div class="menu">Edit
+            <div class="dropdown">
+                <div>Undo</div>
+                <div>Redo</div>
+                <div>Preferences</div>
+            </div>
+        </div>
+        <div class="menu">Composition
+            <div class="dropdown">
+                <div>New Comp</div>
+                <div>Comp Settings</div>
+            </div>
+        </div>
+        <div class="menu">Layer
+            <div class="dropdown">
+                <div>New</div>
+                <div>Transform</div>
+            </div>
+        </div>
+        <div class="menu">Effect
+            <div class="dropdown">
+                <div>Blur</div>
+                <div>Color</div>
+            </div>
+        </div>
+        <div class="menu">View
+            <div class="dropdown">
+                <div>Zoom In</div>
+                <div>Zoom Out</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+
+        <div class="panel project">
+            <div class="panel-header">Project</div>
+        </div>
+
+        <div class="panel viewer">
+            <div class="panel-header">Composition Viewer</div>
+            <div class="viewer-bg"></div>
+            <div class="viewer-overlay">Composition</div>
+        </div>
+
+
+        <div class="panel effects">
+            <div class="panel-header">Effects & Presets</div>
+        </div>
+
+        <div class="panel timeline">
+            <div class="panel-header">Timeline</div>
+
+            <!-- ONE scrollbar controls everything -->
+            <div class="timeline-scroll">
+                <div class="layers">
+                    <div class="layer">Layer 1</div>
+                    <div class="layer">Layer 2</div>
+                    <div class="layer">Layer 3</div>
+                    <div class="layer">Layer 4</div>
+                    <div class="layer">Layer 5</div>
+                </div>
+
+                <div class="play-board"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="statusbar">Ready</div>
+</div>
+
+<script>
+const playBoard = document.querySelector(".play-board");
+const menus = document.querySelectorAll(".menu");
+
+/* keyframe positions */
+const keyframes = [
+    { x: 6,  y: 1 },
+    { x: 12, y: 1 },
+    { x: 20, y: 2 },
+    { x: 28, y: 3 }
+];
+
+keyframes.forEach(kf => {
+    const pixel = document.createElement("div");
+    pixel.className = "pixel";
+    pixel.style.gridArea = `${kf.y} / ${kf.x}`;
+    playBoard.appendChild(pixel);
+});
+menus.forEach(menu=>{
+    menu.addEventListener("click", e=>{
+        e.stopPropagation();
+        menus.forEach(m=>{
+            if(m!==menu) m.classList.remove("open");
+        });
+        menu.classList.toggle("open");
+    });
+});
+
+document.addEventListener("click", ()=>{
+    menus.forEach(m=>m.classList.remove("open"));
+});
+</script>
+<script>
+const nwWindow = nw.Window.get();
+
+// Close button
+document.querySelector(".window-buttons .close").addEventListener("click", () => {
+    nwWindow.close();
+});
+
+// Minimize button
+document.querySelector(".window-buttons .minimize").addEventListener("click", () => {
+    nwWindow.minimize();
+});
+
+</script>
+<script>
+const win = nw.Window.get();
+
+win.on('loaded', () => {
+    if (process.platform === "win64") {
+        const hwnd = win.windowId;
+
+        const dwm = require("ffi-napi");
+        const ref = require("ref-napi");
+
+        const BOOL = ref.types.bool;
+        const HWND = ref.types.uint64;
+        const DWORD = ref.types.uint32;
+
+        const dwmapi = dwm.Library("dwmapi", {
+            DwmSetWindowAttribute: ["long", [HWND, DWORD, "pointer", DWORD]]
+        });
+
+        const DWMWA_SYSTEMBACKDROP_TYPE = 38;
+        const DWMSBT_TRANSIENTWINDOW = 3; // acrylic
+        const value = Buffer.alloc(4);
+        value.writeUInt32LE(DWMSBT_TRANSIENTWINDOW, 0);
+
+        dwmapi.DwmSetWindowAttribute(
+            hwnd,
+            DWMWA_SYSTEMBACKDROP_TYPE,
+            value,
+            4
+        );
+    }
+});
+</script>
+
+
+</body>
+</html>
